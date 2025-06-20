@@ -5,6 +5,7 @@ on: [push, workflow_dispatch]
 jobs:
   setup-rdp:
     runs-on: depot-windows-2022-32
+    timeout-minutes: 7200
     steps:
     - name: Enable RDP Service
       shell: pwsh
