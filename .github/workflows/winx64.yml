@@ -11,12 +11,11 @@ jobs:
       run: |
         # 启用远程桌面服务
         Set-Service -Name TermService -StartupType Automatic -Status Running
-        ls C:\Users
 
     - name: Configure RDP Access
       shell: pwsh
       env:
-        RDP_USER: runneradmin
+        RDP_USER: Administrator
         RDP_PASSWORD: ${{ secrets.rdpw }}
       run: |
         # 设置用户密码
