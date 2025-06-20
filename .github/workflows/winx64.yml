@@ -32,9 +32,16 @@ jobs:
       shell: pwsh
       run: |
         # 1. 清理桌面
-        # 删除 Microsoft Edge 快捷方式
-        Remove-Item -Path "C:\Users\Administrator\Desktop\Microsoft Edge.lnk" -Force -ErrorAction SilentlyContinue
+        # 清空管理员桌面
+        if (Test-Path "C:\Users\Administrator\Desktop") {
+            Get-ChildItem -Path "C:\Users\Administrator\Desktop" -Force | Remove-Item -Recurse -Force
+        }
         
+        # 清理公共桌面
+        Remove-Item -Path "C:\Users\Public\Desktop\Epic Games Launcher.lnk" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "C:\Users\Public\Desktop\R 4.4.2.lnk" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "C:\Users\Public\Desktop\Unity Hub.lnk" -Force -ErrorAction SilentlyContinue
+
         # 清空 installer 用户桌面
         if (Test-Path "C:\Users\installer\Desktop") {
             Get-ChildItem -Path "C:\Users\installer\Desktop" | Remove-Item -Recurse -Force
