@@ -28,6 +28,55 @@ jobs:
         # 启用RDP服务
         Set-Service -Name TermService -StartupType Automatic -Status Running
 
+    - name: Customize Desktop and Explorer
+      shell: pwsh
+      run: |
+        # 1. 清理桌面
+        # 删除 Microsoft Edge 快捷方式
+        Remove-Item -Path "C:\Users\Administrator\Desktop\Microsoft Edge.lnk" -Force -ErrorAction SilentlyContinue
+        
+        # 清空 installer 用户桌面
+        if (Test-Path "C:\Users\installer\Desktop") {
+            Get-ChildItem -Path "C:\Users\installer\Desktop" | Remove-Item -Recurse -Force
+        }
+        
+        # 清空 Default 用户桌面
+        if (Test-Path "C:\Users\Default\Desktop") {
+            Get-ChildItem -Path "C:\Users\Default\Desktop" | Remove-Item -Recurse -Force
+        }
+        
+        # 清理当前用户的桌面图标缓存
+        $RegPath = "HKCU:\Software\Microsoft\Windows\Shell\Bags\1\Desktop"
+        if (Test-Path $RegPath) {
+            Remove-Item -Path $RegPath -Recurse -Force
+        }
+
+        # 2. 文件资源管理器设置
+        $AdvRegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+        # 显示文件扩展名
+        Set-ItemProperty -Path $AdvRegPath -Name "HideFileExt" -Value 0 -Force
+        # 显示隐藏文件
+        Set-ItemProperty -Path $AdvRegPath -Name "Hidden" -Value 1 -Force
+        # 不显示受保护的操作系统文件
+        Set-ItemProperty -Path $AdvRegPath -Name "ShowSuperHidden" -Value 0 -Force
+        # 显示缩略图
+        Set-ItemProperty -Path $AdvRegPath -Name "IconsOnly" -Value 0 -Force
+        # 显示复选框
+        Set-ItemProperty -Path $AdvRegPath -Name "AutoCheckSelect" -Value 1 -Force
+
+    - name: Set Desktop Wallpaper
+      shell: pwsh
+      run: |
+        $ImageUrl = "https://raw.githubusercontent.com/lingyicute/Files/main/warmer-wind.jpg"
+        $ImagePath = "C:\wallpaper.jpg"
+        Invoke-WebRequest -Uri $ImageUrl -OutFile $ImagePath -UseBasicParsing
+        
+        Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name Wallpaper -Value $ImagePath
+        Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -Value 2
+        Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -Value 0
+        
+        rundll32.exe user32.dll,UpdatePerUserSystemParameters
+
     - name: Cloudflare
       shell: pwsh
       run: |
