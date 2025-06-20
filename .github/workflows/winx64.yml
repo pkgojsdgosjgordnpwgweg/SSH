@@ -70,6 +70,9 @@ jobs:
         Set-ItemProperty -Path $AdvRegPath -Name "IconsOnly" -Value 0 -Force
         # 显示复选框
         Set-ItemProperty -Path $AdvRegPath -Name "AutoCheckSelect" -Value 1 -Force
+        
+        # 刷新桌面并触发图标重新排列
+        rundll32.exe user32.dll,UpdatePerUserSystemParameters
 
     - name: Set Desktop Wallpaper
       shell: pwsh
@@ -83,6 +86,23 @@ jobs:
         Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -Value 0
         
         rundll32.exe user32.dll,UpdatePerUserSystemParameters
+
+    - name: Set Google Chrome as Default Browser
+      shell: pwsh
+      run: |
+        $xmlContent = @'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <DefaultAssociations>
+          <Association Identifier=".htm" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
+          <Association Identifier=".html" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
+          <Association Identifier="http" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
+          <Association Identifier="https" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
+        </DefaultAssociations>
+        '@
+        $xmlPath = "C:\default-browser.xml"
+        $xmlContent | Out-File -FilePath $xmlPath -Encoding utf8
+        Dism.exe /Online /Import-DefaultAppAssociations:$xmlPath
+        Remove-Item -Path $xmlPath -Force
 
     - name: Cloudflare
       shell: pwsh
