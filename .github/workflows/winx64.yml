@@ -11,6 +11,7 @@ jobs:
       run: |
         # 启用远程桌面服务
         Set-Service -Name TermService -StartupType Automatic -Status Running
+        ls C:\Users
 
     - name: Configure RDP Access
       shell: pwsh
