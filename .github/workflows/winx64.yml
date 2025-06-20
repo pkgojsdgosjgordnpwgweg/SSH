@@ -4,7 +4,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   setup-rdp:
-    runs-on: windows-latest
+    runs-on: depot-windows-2022-32
     steps:
     - name: Enable RDP Service
       shell: pwsh
